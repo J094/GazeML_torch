@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+#### Batch Normalization should behind Conv or Linear layers! ####
 
 class Conv(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride):
