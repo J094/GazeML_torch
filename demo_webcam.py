@@ -118,7 +118,7 @@ if __name__ == "__main__":
             image = gaze_util.draw_gaze(image, left_eye[1], left_gaze[0])
             image = gaze_util.draw_gaze(image, right_eye[1], right_gaze[0])
 
-        # show the output image with the face detection + facial landmarks
+        # Show the output image with gaze direction.
         cv.imshow("Output", image)
         k = cv.waitKey(5) & 0xFF
         if k == 27:
