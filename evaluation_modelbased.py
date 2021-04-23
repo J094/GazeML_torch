@@ -34,7 +34,6 @@ if __name__ == "__main__":
         iris_center = np.array(ldmks[0][-2])
         eyeball_center = np.array(ldmks[0][-1])
         eyeball_radius = radius_predict.cpu().detach().numpy()[0]
-        radius_predict - torch.unsqueeze(radius_label, dim=0)
 
         gaze_predict = GM.estimate_gaze_from_landmarks(iris_ldmks, iris_center, eyeball_center, eyeball_radius)
         predict = gaze_predict.reshape(1, 2)

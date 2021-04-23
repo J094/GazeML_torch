@@ -73,9 +73,6 @@ def angular_error(a, b):
     return np.arccos(similarity) * radians_to_degrees
 
 
-"""
-计算平均角误差
-"""
 def mean_angular_error(a, b):
     """Calculate mean angular error (via cosine similarity)."""
     return np.mean(angular_error(a, b))

@@ -280,7 +280,6 @@ class UnityEyesDataset(torch.utils.data.IterableDataset):
         # Select and transform landmark coordinates
         iris_centre = np.asarray([
             iw_2 + original_eyeball_radius * -np.cos(original_gaze[0]) * np.sin(original_gaze[1]),
-            # I think it's plus here instead of minus.
             ih_2 + original_eyeball_radius * -np.sin(original_gaze[0]),
             ])
         landmarks = np.concatenate([interior_landmarks[::2, :2],  # 8
