@@ -44,16 +44,14 @@ def clip_eye_region(eye_region_landmarks, image, image_shape):
     
     return [left_eye_image, left_middle], [right_eye_image, right_middle]
 
-def estimate_gaze(eye_image):
-    elg_model = torch.load('./models/v0.2/model-v0.2-(36, 60)-epoch-89-loss-0.7151.pth')
-    elg_model.eval()
+def estimate_gaze(eye_image, model):
     eye_image = np.expand_dims(eye_image, -1)
     # Change format to NCHW.
     eye_image = np.transpose(eye_image, (2, 0, 1))
     eye_image = torch.unsqueeze(torch.Tensor(eye_image), dim=0)
     eye_input = eye_image.cuda()
     # Do predict by elg_model.
-    heatmaps_predict, ldmks_predict, radius_predict = elg_model(eye_input)
+    heatmaps_predict, ldmks_predict, radius_predict = model(eye_input)
     # Get parameters for model_based gaze estimator.
     ldmks = ldmks_predict.cpu().detach().numpy()
     iris_ldmks = np.array(ldmks[0][0:8])
@@ -75,6 +73,8 @@ if __name__ == "__main__":
     p = "./src/models/shape_predictor_5_face_landmarks.dat"
     detector = dlib.cnn_face_detection_model_v1(d)
     predictor = dlib.shape_predictor(p)
+    elg_model = torch.load('./models/v0.2/model-v0.2-(36, 60)-epoch-89-loss-0.7151.pth')
+    elg_model.eval()
 
     cap = cv.VideoCapture(0)
 
@@ -111,10 +111,10 @@ if __name__ == "__main__":
             eye_region_landmarks = shape[0:4]
             left_eye, right_eye = clip_eye_region(eye_region_landmarks, gray, gray.shape)
             # As this elg_model only train for right eyes, so need to do flip for left eyes before estimate.
-            left_gaze = estimate_gaze(cv.flip(left_eye[0], 1))
+            left_gaze = estimate_gaze(cv.flip(left_eye[0], 1), model=elg_model)
             # Change gaze respect to left eyes.
             left_gaze[0][1] = -left_gaze[0][1]
-            right_gaze = estimate_gaze(right_eye[0])
+            right_gaze = estimate_gaze(right_eye[0], model=elg_model)
             image = gaze_util.draw_gaze(image, left_eye[1], left_gaze[0])
             image = gaze_util.draw_gaze(image, right_eye[1], right_gaze[0])
 
