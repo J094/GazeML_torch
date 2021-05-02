@@ -13,9 +13,7 @@ scipy
 ```
 
 ## Example
-![GazeML_torch_v0.2_jun](https://z3.ax1x.com/2021/05/03/ger3Oe.md.gif)
-
-[![ger3Oe.gif](https://z3.ax1x.com/2021/05/03/ger3Oe.gif)](https://imgtu.com/i/ger3Oe)
+![GazeML_torch_v0.2_jun](https://z3.ax1x.com/2021/05/03/gerRf0.gif)
 
 ![GazeML_torch_v0.2_jiabin](https://z3.ax1x.com/2021/04/23/cXfdts.gif)
 
