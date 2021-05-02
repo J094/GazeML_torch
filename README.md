@@ -13,8 +13,6 @@ scipy
 ```
 
 ## Example
-![GazeML_torch_v0.2_jun1](https://z3.ax1x.com/2021/04/23/cXfwhn.gif)
-
 ![GazeML_torch_v0.2_jiabin](https://z3.ax1x.com/2021/04/23/cXfdts.gif)
 
 ![GazeML_torch_v0.2_jun2](https://z3.ax1x.com/2021/05/03/ger3Oe.gif)
