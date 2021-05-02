@@ -13,11 +13,11 @@ scipy
 ```
 
 ## Example
-![GazeML_torch_v0.2_jun1](https://imgtu.com/i/ger3Oe)
+[![ger3Oe.md.gif](https://z3.ax1x.com/2021/05/03/ger3Oe.md.gif)](https://imgtu.com/i/ger3Oe)
 
-![GazeML_torch_v0.2_jiabin](https://imgtu.com/i/cXfwhn)
+[![cXfwhn.md.gif](https://z3.ax1x.com/2021/04/23/cXfwhn.md.gif)](https://imgtu.com/i/cXfwhn)
 
-![GazeML_torch_v0.2_jun2](https://imgtu.com/i/ger3Oe)
+[![cXfdts.md.gif](https://z3.ax1x.com/2021/04/23/cXfdts.md.gif)](https://imgtu.com/i/cXfdts)
 
 ## Webcam Demo
 ```
