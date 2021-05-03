@@ -3,7 +3,7 @@ Reproduction of https://github.com/swook/GazeML (paper: https://arxiv.org/abs/18
 
 ## Requirement
 ```
-pytorch
+pytorch (cuda)
 tensorboard
 numpy
 opencv
