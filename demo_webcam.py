@@ -11,13 +11,13 @@ import src.utils.gaze as gaze_util
 
 def clip_eye_region(eye_region_landmarks, image):
     # Output size.
-    oh, ow = 72, 120
+    oh, ow = 36, 60
 
     def process_coords(coords_list):
         return np.array([(x, y) for (x, y) in coords_list])
 
     def process_rescale_clip(eye_landmarks):
-        eye_width = 1.5 * abs(eye_landmarks[0][0] - eye_landmarks[1][0])
+        eye_width = 2.0 * abs(eye_landmarks[0][0] - eye_landmarks[1][0])
         eye_middle = (eye_landmarks[0] + eye_landmarks[1]) / 2
 
         recentre_mat = np.asmatrix(np.eye(3))
@@ -62,7 +62,7 @@ def estimate_gaze(eye_image, transform_mat, model, is_left: bool):
     predict = gaze_predict.reshape(1, 2)
     iris_center = ldmks_predict[0].cpu().detach().numpy()[16]
     if is_left:
-        iris_center[0] = 120 - iris_center[0]
+        iris_center[0] = 60 - iris_center[0]
     iris_center = (iris_center - [transform_mat[0][2], transform_mat[1][2]]) / transform_mat[0][0]
     return predict, iris_center
 
