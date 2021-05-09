@@ -8,17 +8,16 @@ import numpy as np
 import src.models.gaze_modelbased as GM
 import src.utils.gaze as gaze_util
 
-def clip_eye_region(eye_region_landmarks, image, image_shape):
-    # Input size.
-    ih, iw = image_shape
+
+def clip_eye_region(eye_region_landmarks, image):
     # Output size.
-    oh, ow = 36, 60
+    oh, ow = 72, 120
 
     def process_coords(coords_list):
         return np.array([(x, y) for (x, y) in coords_list])
 
     def process_rescale_clip(eye_landmarks):
-        eye_width = 1.5 * abs(left_eye_landmarks[0][0] - left_eye_landmarks[1][0])
+        eye_width = 1.5 * abs(eye_landmarks[0][0] - eye_landmarks[1][0])
         eye_middle = (eye_landmarks[0] + eye_landmarks[1]) / 2
 
         recentre_mat = np.asmatrix(np.eye(3))
@@ -35,16 +34,16 @@ def clip_eye_region(eye_region_landmarks, image, image_shape):
         eye = eye.astype(np.float32)
         eye *= 2.0 / 255.0
         eye -= 1.0
-        return eye, eye_middle
+        return eye, np.asarray(transform_mat)
 
     left_eye_landmarks = process_coords(eye_region_landmarks[2:4])
     right_eye_landmarks = process_coords(eye_region_landmarks[0:2])
-    left_eye_image, left_middle = process_rescale_clip(left_eye_landmarks)
-    right_eye_image, right_middle = process_rescale_clip(right_eye_landmarks)
+    left_eye_image, left_transform_mat = process_rescale_clip(left_eye_landmarks)
+    right_eye_image, right_transform_mat = process_rescale_clip(right_eye_landmarks)
     
-    return [left_eye_image, left_middle], [right_eye_image, right_middle]
+    return [left_eye_image, left_transform_mat], [right_eye_image, right_transform_mat]
 
-def estimate_gaze(eye_image, model):
+def estimate_gaze(eye_image, transform_mat, model):
     eye_image = np.expand_dims(eye_image, -1)
     # Change format to NCHW.
     eye_image = np.transpose(eye_image, (2, 0, 1))
@@ -61,7 +60,9 @@ def estimate_gaze(eye_image, model):
     # Predict gaze.
     gaze_predict = GM.estimate_gaze_from_landmarks(iris_ldmks, iris_center, eyeball_center, eyeball_radius)
     predict = gaze_predict.reshape(1, 2)
-    return predict
+    iris_center = ldmks_predict[0].cpu().detach().numpy()[16]
+    iris_center = (iris_center - [transform_mat[0][2], transform_mat[1][2]]) / transform_mat[0][0]
+    return predict, iris_center
 
 
 
@@ -103,20 +104,20 @@ if __name__ == "__main__":
 
             # loop over the (x, y) for the eye-region landmarks
             # and draw them on the image
-            # for (j, (x, y)) in enumerate(shape):
-            #     if j in range(0, 4):
-            #         cv.circle(image, (x, y), 2, (0, 255, 0), -1)
+            for (j, (x, y)) in enumerate(shape):
+                if j in range(0, 4):
+                    cv.circle(image, (x, y), 2, (0, 255, 0), -1)
             # 0-1:Right to Left in Right Eye.
             # 2-3:Left to Right in Left Eye.
             eye_region_landmarks = shape[0:4]
-            left_eye, right_eye = clip_eye_region(eye_region_landmarks, gray, gray.shape)
+            left_eye, right_eye = clip_eye_region(eye_region_landmarks, gray)
             # As this elg_model only train for right eyes, so need to do flip for left eyes before estimate.
-            left_gaze = estimate_gaze(cv.flip(left_eye[0], 1), model=elg_model)
+            left_gaze, left_iris_center = estimate_gaze(cv.flip(left_eye[0], 1), transform_mat=left_eye[1], model=elg_model)
             # Change gaze respect to left eyes.
             left_gaze[0][1] = -left_gaze[0][1]
-            right_gaze = estimate_gaze(right_eye[0], model=elg_model)
-            image = gaze_util.draw_gaze(image, left_eye[1], left_gaze[0])
-            image = gaze_util.draw_gaze(image, right_eye[1], right_gaze[0])
+            right_gaze, right_iris_center = estimate_gaze(right_eye[0], transform_mat=right_eye[1], model=elg_model)
+            image = gaze_util.draw_gaze(image, left_iris_center, left_gaze[0])
+            image = gaze_util.draw_gaze(image, right_iris_center, right_gaze[0])
 
         # Show the output image with gaze direction.
         cv.imshow("Output", image)
