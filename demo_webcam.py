@@ -17,7 +17,7 @@ def clip_eye_region(eye_region_landmarks, image):
         return np.array([(x, y) for (x, y) in coords_list])
 
     def process_rescale_clip(eye_landmarks):
-        eye_width = 2.0 * abs(eye_landmarks[0][0] - eye_landmarks[1][0])
+        eye_width = 1.5 * abs(eye_landmarks[0][0] - eye_landmarks[1][0])
         eye_middle = (eye_landmarks[0] + eye_landmarks[1]) / 2
 
         recentre_mat = np.asmatrix(np.eye(3))
