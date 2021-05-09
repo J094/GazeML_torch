@@ -43,7 +43,7 @@ def clip_eye_region(eye_region_landmarks, image):
     
     return [left_eye_image, left_transform_mat], [right_eye_image, right_transform_mat]
 
-def estimate_gaze(eye_image, transform_mat, model):
+def estimate_gaze(eye_image, transform_mat, model, is_left: bool):
     eye_image = np.expand_dims(eye_image, -1)
     # Change format to NCHW.
     eye_image = np.transpose(eye_image, (2, 0, 1))
@@ -61,6 +61,8 @@ def estimate_gaze(eye_image, transform_mat, model):
     gaze_predict = GM.estimate_gaze_from_landmarks(iris_ldmks, iris_center, eyeball_center, eyeball_radius)
     predict = gaze_predict.reshape(1, 2)
     iris_center = ldmks_predict[0].cpu().detach().numpy()[16]
+    if is_left:
+        iris_center[0] = 120 - iris_center[0]
     iris_center = (iris_center - [transform_mat[0][2], transform_mat[1][2]]) / transform_mat[0][0]
     return predict, iris_center
 
@@ -112,10 +114,20 @@ if __name__ == "__main__":
             eye_region_landmarks = shape[0:4]
             left_eye, right_eye = clip_eye_region(eye_region_landmarks, gray)
             # As this elg_model only train for right eyes, so need to do flip for left eyes before estimate.
-            left_gaze, left_iris_center = estimate_gaze(cv.flip(left_eye[0], 1), transform_mat=left_eye[1], model=elg_model)
+            left_gaze, left_iris_center = estimate_gaze(
+                cv.flip(left_eye[0], 1), 
+                transform_mat=left_eye[1],
+                model=elg_model,
+                is_left=True,
+            )
             # Change gaze respect to left eyes.
             left_gaze[0][1] = -left_gaze[0][1]
-            right_gaze, right_iris_center = estimate_gaze(right_eye[0], transform_mat=right_eye[1], model=elg_model)
+            right_gaze, right_iris_center = estimate_gaze(
+                right_eye[0],
+                transform_mat=right_eye[1], 
+                model=elg_model,
+                is_left=False,
+            )
             image = gaze_util.draw_gaze(image, left_iris_center, left_gaze[0])
             image = gaze_util.draw_gaze(image, right_iris_center, right_gaze[0])
 
